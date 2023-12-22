@@ -56,10 +56,10 @@ fdisk -l(此处为小写字母l)
 我们使用`cfdisk`
 
 分区类型:EFI系统分区
-大小:550M
+大小:512M
 
 分区类型:Linux swap
-大小:2G
+大小:根据内存大小
 
 分区类型:根分区
 大小:剩余空间
@@ -128,7 +128,7 @@ Server = http://mirrors.163.com/archlinux/$repo/os/$arch
 
 安装系统
 ```
-pacstrap /mnt base linux linux-firmware base-devel vim
+pacstrap /mnt base linux linux-firmware base-devel neovim intel-ucode nano
 ```
 **配置**
 
@@ -181,7 +181,7 @@ boot/efi
 ```
 
 ```
-grub-install --target=x86_64-efi --efi-directory=/mnt/boot/efi --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/mnt/boot --bootloader-id=GRUB
 ```
 
 ```
