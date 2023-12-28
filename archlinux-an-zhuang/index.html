@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+
+      <title>
+  archlinux安装教程 | Dr. Henry Jekyll
+</title>
+
+      <link rel="stylesheet" href="https://jumphave.github.io/henry.css">
+
+      
+
+      
+      
+    </head>
+
+    <body>
+        <header>
+            <div class="header-content">
+                <a class="header-content-title" href="https:&#x2F;&#x2F;jumphave.github.io">Dr. Henry Jekyll</a>
+                <nav class="header-content-nav">
+                    <a href="#" class="header-content-nav-icon">
+                    <svg viewBox="0 0 18 15" width="18">
+                        <path fill="#5c5c5c" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                        <path fill="#5c5c5c" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                        <path fill="#5c5c5c" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                    </svg>
+                    </a>
+                    <div class="header-content-nav-trigger">
+                        
+                        
+                        <a class="header-content-nav-trigger-link" href="about">About</a>
+                        
+                        
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main class="blog">
+            
+<main class="page">
+    <article class="page-content" itemscope itemtype="http://schema.org/BlogPosting">
+        <h1 class="page-content-title" itemprop="name headline">archlinux安装教程</h1>
+        <div class="page-content-meta">
+            <time datetime="2023-06-23T00:00:00+00:00" itemprop="datePublished">June 23, 2023</time>
+        </div>
+        <div class="page-content-body" itemprop="articleBody">
+            <h1 id="kai-shi-an-zhuang">开始安装</h1>
+<p><strong>连接互联网</strong></p>
+<pre><code>iwctl
+</code></pre>
+<p>首先，如果不知道你的网络设备名称，请列出所有 WiFi 设备：</p>
+<pre><code>[iwd]# device list
+</code></pre>
+<p>如果设备或其相应的适配器已关闭，请将其打开。</p>
+<pre><code>[iwd]# adapter adapter set-property Powered on
+</code></pre>
+<p>然后，要开始扫描网络（注意：这个命令不会输出任何内容），执行：</p>
+<pre><code>[iwd]# station device scan
+</code></pre>
+<p>再然后，就可以列出所有可用的网络：</p>
+<pre><code>[iwd]# station device get-networks
+</code></pre>
+<p>最后，要连接到一个网络：</p>
+<pre><code>[iwd]# station [名称] connect [SSID]
+</code></pre>
+<p><strong>更新系统时间</strong></p>
+<pre><code>timedatectl
+</code></pre>
+<p><strong>创建硬盘分区</strong></p>
+<pre><code>fdisk -l(此处为小写字母l)
+</code></pre>
+<p>我们使用<code>cfdisk</code></p>
+<p>分区类型:EFI系统分区
+大小:512M</p>
+<p>分区类型:Linux swap
+大小:根据内存大小</p>
+<p>分区类型:根分区
+大小:剩余空间</p>
+<p><strong>格式化分区</strong></p>
+<p>根分区：</p>
+<pre><code>mkfs.ext4 &#x2F;dev&#x2F;root_partition
+</code></pre>
+<p>交换空间分区：</p>
+<pre><code>mkswap &#x2F;dev&#x2F;swap_partition
+</code></pre>
+<p>EFI系统分区：</p>
+<pre><code>mkfs.fat -F 32 &#x2F;dev&#x2F;efi_system_partition
+</code></pre>
+<p><strong>挂载分区</strong></p>
+<p>根分区：</p>
+<pre><code>mount &#x2F;dev&#x2F;root_partition（根分区） &#x2F;mnt
+</code></pre>
+<p>UEFI系统分区：</p>
+<pre><code>mkdir -p &#x2F;mnt&#x2F;boot
+</code></pre>
+<pre><code>mount --mkdir &#x2F;dev&#x2F;（EFI 系统分区） &#x2F;mnt&#x2F;boot&#x2F;efi
+</code></pre>
+<p>交换空间：</p>
+<pre><code>swapon &#x2F;dev&#x2F;swap_partition（交换空间分区）
+</code></pre>
+<p><strong>安装</strong></p>
+<pre><code>首先，修改镜像源
+</code></pre>
+<pre><code>vim &#x2F;etc&#x2F;pacman.d&#x2F;mirrorlist
+</code></pre>
+<p>删除所有镜像，填写163镜像源。</p>
+<pre><code>Server = http:&#x2F;&#x2F;mirrors.163.com&#x2F;archlinux&#x2F;$repo&#x2F;os&#x2F;$arch
+</code></pre>
+<p>可以根据自己所在地区的运营商进行ping比对，以上仅供参考。</p>
+<p>安装系统</p>
+<pre><code>pacstrap &#x2F;mnt base linux linux-firmware base-devel neovim intel-ucode nano
+</code></pre>
+<p><strong>配置</strong></p>
+<p>分区表</p>
+<pre><code>genfstab -U &#x2F;mnt &gt;&gt; &#x2F;mnt&#x2F;etc&#x2F;fstab
+
+</code></pre>
+<pre><code>chroot
+</code></pre>
+<p>进入新系统：</p>
+<pre><code>arch-chroot &#x2F;mnt
+</code></pre>
+<p>时区</p>
+<p>设置时区：</p>
+<pre><code>ln -sf &#x2F;usr&#x2F;share&#x2F;zoneinfo&#x2F;Asia&#x2F;Shanghai &#x2F;etc&#x2F;localtime
+</code></pre>
+<p>将系统时间写入硬件时钟：</p>
+<pre><code>hwclock --sys
+</code></pre>
+<p>安装引导程序</p>
+<pre><code>pacman -S dosfstools grub efibootmgr
+</code></pre>
+<p>再次执行</p>
+<pre><code>mkdir -p &#x2F;mnt&#x2F;boot
+</code></pre>
+<pre><code>mount --mkdir &#x2F;dev&#x2F;（EFI 系统分区） &#x2F;mnt&#x2F;
+boot&#x2F;efi
+</code></pre>
+<pre><code>grub-install --target=x86_64-efi --efi-directory=&#x2F;mnt&#x2F;boot --bootloader-id=GRUB
+</code></pre>
+<pre><code>grub-mkconfig -o &#x2F;boot&#x2F;grub&#x2F;grub.cfg
+</code></pre>
+<p><strong>检查grub设置:</strong></p>
+<p>检查/etc/default/grub中的GRUB_TIMEOUT 是否设置成了0，设置为一个正数来调整GRUB条目加载前的等待时间，按秒计时。另外要检查GRUB_TIMEOUT_STYLE是否为hidden，设置为menu确保菜单显示。重新生成主配置文件后，重启检查设置是否生效。</p>
+<p>重启</p>
+<pre><code>umount -R &#x2F;mnt
+</code></pre>
+<pre><code>reboot
+</code></pre>
+
+        </div>
+    </article>
+</main>
+
+        </main>
+
+        <footer>
+            <div class="footer-content">
+            <div class="footer-content-left">
+                
+            </div>
+            <div class="footer-content-right">
+                
+                <a href="https:&#x2F;&#x2F;twitter.com&#x2F;jekyllrb">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="20">
+                        <path fill="#1e1e1e" d="M0 781.864q0 7.32 7.32 13.176 12.2 8.296 43.432 24.4 119.072 61.488 249.856 61.488 162.992 0 296.216 -83.936 63.44 -40.016 112.728 -96.38t78.324 -117.608 43.432 -122.732 13.42 -119.56v-17.08q57.096 -40.992 89.304 -93.696 2.928 -5.856 2.928 -8.784 0 -6.344 -4.88 -11.224t-11.224 -4.88q-3.416 0 -11.712 3.904 -5.856 1.952 -14.396 4.88t-14.64 5.124 -8.052 2.684q12.688 -14.152 26.352 -38.308t13.664 -35.38q0 -6.344 -4.88 -10.98t-11.712 -4.636q-3.904 0 -7.808 2.44 -55.632 29.768 -103.944 40.504 -59.048 -56.12 -141.032 -56.12 -83.936 0 -142.984 58.56t-59.048 141.52q0 14.64 1.952 23.912 -82.472 -6.832 -159.088 -39.528t-137.616 -87.84q-14.152 -13.664 -54.656 -57.096 -5.856 -5.856 -13.664 -5.856 -5.856 0 -12.2 7.808 -12.688 19.032 -20.008 46.604t-7.32 53.924q0 72.712 45.384 126.88l-14.152 -6.832q-12.2 -5.368 -18.056 -5.368 -8.296 0 -13.908 4.88t-5.612 12.688q0 51.24 26.352 97.112t71.248 73.2l-5.856 -.976q-.976 0 -2.684 -.488t-2.684 -.732 -1.464 -.244q-6.344 0 -10.98 4.88t-4.636 10.736q0 .488 .976 5.368 16.592 50.752 55.144 86.132t90.28 47.58q-84.912 52.216 -187.392 52.216 -6.832 0 -21.96 -1.464 -20.496 -.976 -22.448 -.976 -6.344 0 -10.98 4.88t-4.636 11.224z"/>
+                    </svg>
+                </a>
+                
+                
+                <a href="https:&#x2F;&#x2F;github.com&#x2F;sirodoht&#x2F;zola-henry">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="20">
+                        <path fill="#1e1e1e" d="M512 0C229.25 0 0 229.25 0 512c0 226.25 146.688 418.125 350.156 485.812 25.594 4.688 34.938-11.125 34.938-24.625 0-12.188-.469-52.562-.719-95.312C242 908.812 211.906 817.5 211.906 817.5c-23.312-59.125-56.844-74.875-56.844-74.875-46.531-31.75 3.53-31.125 3.53-31.125 51.406 3.562 78.47 52.75 78.47 52.75 45.688 78.25 119.875 55.625 149 42.5 4.654-33 17.904-55.625 32.5-68.375-113.656-12.937-233.218-56.875-233.218-253.063 0-55.938 19.969-101.562 52.656-137.406-5.219-13-22.844-65.094 5.062-135.562 0 0 42.938-13.75 140.812 52.5 40.812-11.406 84.594-17.031 128.125-17.219 43.5.188 87.312 5.875 128.188 17.281 97.688-66.312 140.688-52.5 140.688-52.5 28 70.531 10.375 122.562 5.125 135.5 32.812 35.844 52.625 81.469 52.625 137.406 0 196.688-119.75 240-233.812 252.688 18.438 15.875 34.75 47 34.75 94.75 0 68.438-.688 123.625-.688 140.5 0 13.625 9.312 29.562 35.25 24.562C877.438 930 1024 738.125 1024 512 1024 229.25 794.75 0 512 0z"/>
+                    </svg>
+                </a>
+                
+            </div>
+            </div>
+        </footer>
+    </body>
+</html>
